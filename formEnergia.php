@@ -21,11 +21,13 @@
                 $nameErr = "Somente letras e espaços em branco são permitidos";
             }
         }
+
         if (empty($_POST["sexo"])) {
             $sexoErr = "Sexo é obrigatório";
         } else {
             $sexo = test_input($_POST["sexo"]);
         }
+
         if (empty($_POST["endereco"])) {
             $enderecoErr = "Endereço é obrigatório";
         } else {
@@ -35,6 +37,7 @@
                 $enderecoErr = "Somente letras, espaços em branco e números são permitidos";
             }
         }
+
         if (empty($_POST["cep"])) {
             $cepErr = "CEP é obrigatório";
         } else {
@@ -44,6 +47,7 @@
                 $cepErr = "Somente números são permitidos";
             }
         }
+
         if (empty($_POST["bairro"])) {
             $bairroErr = "Bairro é obrigatório";
         } else {
@@ -53,15 +57,17 @@
                 $bairroErr = "Somente letras e espaços em branco são permitidos";
             }
         }
+
         if (empty($_POST["cpf"])) {
             $cpfErr = "CPF é obrigatório";
         } else {
             $cpf = test_input($_POST["cpf"]);
-            // verifique se o CPF está bem formado
-            if (!preg_match("/^[0-9]*$/",$cpf)) {
-                $cpfErr = "Somente números são permitidos";
+            //puxar a função validar CPF
+            if (!validaCPF($cpf)) {
+                $cpfErr = "CPF está incorreto digite navamente";
             }
         }
+
         if (empty($_POST["nascimento"])) {
             $nascimentoErr = "Data de nascimento é obrigatório";
         } else {
@@ -71,6 +77,7 @@
                 $nascimentoErr = "Somente números são permitidos";
             }
         }
+
         if (empty($_POST["data_vencimento"])) {
             $data_vencimentoErr = "Data de vencimento é obrigatório";
         } else {
@@ -80,6 +87,7 @@
                 $data_vencimentoErr = "Somente números são permitidos";
             }
         }
+
         if (empty($_POST["uniConsumo"])) {
             $uniConsumoErr = "Unidade de consumo é obrigatório";
         } else {
@@ -89,6 +97,7 @@
                 $uniConsumoErr = "Somente números são permitidos";
             }
         }
+
         if (empty($_POST["email"])) {
             $emailErr = "Email é obrigatório";
         } else {
@@ -98,6 +107,7 @@
                 $emailErr = "Formato de email inválido";
             }
         }
+
         if (empty($_POST["Kwh"])) {
             $KwhErr = "Kwh é obrigatório";
         } else {
@@ -107,6 +117,7 @@
                 $KwhErr = "Somente números são permitidos";
             }
         }
+
         if (empty($_POST["valor"])) {
             $valorErr = "Valor é obrigatório";
         } else {
@@ -116,6 +127,7 @@
                 $valorErr = "Somente números são permitidos";
             }
         }
+
         if (empty($_POST["site"])) {
             $siteErr = "Site é obrigatório";
         } else {
@@ -133,6 +145,54 @@
             $data = htmlspecialchars($data);
             return $data;
         }
+
+        //função para validar o CPF do usuário
+        function validaCPF($cpf) {
+            
+            //remover caracteres especiais
+            $cpf = preg_replace('/[^0-9]/is', '', $cpf);
+
+
+            //verificar se contem 11 digitos
+            if (strlen($cpf) != 11) {
+                return false;
+            }
+            
+            //verificar se todos os digitos são iguais
+            if (preg_match('/(\d)\1{10}/', $cpf)) {
+                return false;
+            }
+
+            // calcular o digito verificador
+            for ($i = 1; $i <= 9; $i++) {
+                $soma = 0;
+                for ($j = 0; $j <= 9; $j++) {
+                    $soma += $cpf[$j + $i - 1] * ((11 + $i - $j) % 11);
+                }
+                $d1 = ((10 * $soma) % 11) % 10;
+                if ($cpf[9 + $i] != $d1) {
+                    return false;
+                }
+            }
+
+            // calcular o segundo digito verificador
+            for ($i = 1; $i <= 9; $i++) {
+                $soma = 0;
+                for ($j = 0; $j <= 9; $j++) {
+                    $soma += $cpf[$j + $i - 1] * ((12 + $i - $j) % 11);
+                }
+                $d2 = ((10 * $soma) % 11) % 10;
+                if ($cpf[10 + $i] != $d2) {
+                    return false;
+                }
+            }
+
+            //CPF válido
+            return true;
+        }
+
+        //
+
     ?>
 
     <h2>Formulário de validação PHP Consumo de energia</h2>
